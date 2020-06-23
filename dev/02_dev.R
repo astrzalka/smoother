@@ -15,12 +15,16 @@
 
 ## Dependencies ----
 ## Add one line by package you want to add as dependency
-usethis::use_package( "thinkr" )
+usethis::use_package( "ggplot2" )
+usethis::use_package( "dplyr" )
+usethis::use_package( "stringr" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/
-golem::add_module( name = "name_of_module1" ) # Name of the module
-golem::add_module( name = "name_of_module2" ) # Name of the module
+# golem::add_module( name = "read_in_data_txt" ) # Name of the module
+# golem::add_module( name = "normalize_data_fluorescence" ) # Name of the module
+# golem::add_module( name = "plot_smoothed_fluorescence" ) # Name of the module
+# golem::add_module( name = "varselect" ) # Name of the module
 
 ## Add helper functions ----
 ## Creates ftc_* and utils_*
@@ -35,7 +39,7 @@ golem::add_css_file( "custom" )
 
 ## Add internal datasets ----
 ## If you have data in your package
-usethis::use_data_raw( name = "my_dataset", open = FALSE ) 
+usethis::use_data_raw( name = "example_data_1", open = FALSE ) 
 
 ## Tests ----
 ## Add one line by test you want to create
