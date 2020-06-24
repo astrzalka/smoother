@@ -22,3 +22,8 @@ devtools::install_github('astrzalka/smoother')
 
 smoother includes example datasets stored in data-raw directory. Example
 dataset test3.txt is included in the app itself for easy testing.
+
+Data can be generated from ImageJ using a script file
+imagej\_get\_profile.ijm. This script will generate plot profiles of all
+present ROI for all channels and save the ROI to a zip file. txt files
+can be directly loaded into the smoother app.
