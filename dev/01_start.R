@@ -16,7 +16,7 @@
 golem::fill_desc(
   pkg_name = "smoother", # The Name of the package containing the App 
   pkg_title = "Fluorescence smoother app for microscopic data", # The Title of the package containing the App 
-  pkg_description = "Application for creating a smoothed plot of fluorescence profiles for 1 or 2 fluorophores", # The Description of the package containing the App 
+  pkg_description = "Application for creating a smoothed plot of fluorescence profiles for 1 or 2 fluorophores.", # The Description of the package containing the App 
   author_first_name = "Agnieszka", # Your First Name
   author_last_name = "Strzałka", # Your Last Name
   author_email = "the.larch19@gmail.com", # Your Email
