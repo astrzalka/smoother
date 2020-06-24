@@ -1,12 +1,8 @@
 Package: smoother
-Title: An Amazing Shiny App
+Title: Fluorescence smoother app for microscopic data
 Version: 0.0.0.9000
-Authors@R: 
-    person(given = "firstname",
-           family = "lastname",
-           role = c("aut", "cre"),
-           email = "your@email.com")
-Description: What the package does (one paragraph).
+Authors@R: person('Agnieszka', 'Strzałka', email = 'the.larch19@gmail.com', role = c('cre', 'aut'))
+Description: Application for creating a smoothed plot of fluorescence profiles for 1 or 2 fluorophores.
 License: MIT + file LICENSE
 Imports: 
     config,
