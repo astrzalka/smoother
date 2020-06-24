@@ -18,6 +18,7 @@
 usethis::use_package( "ggplot2" )
 usethis::use_package( "dplyr" )
 usethis::use_package( "stringr" )
+usethis::use_package( "zoo" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/

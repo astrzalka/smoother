@@ -15,6 +15,7 @@ app_ui <- function(request) {
       
       sidebarLayout(
         sidebarPanel(
+          checkboxInput('example', 'Czy chcesz załadować przykładowe dane?'),
           fileInput("dane_1", 'Wybierz pierwszy plik .txt',
                     accept=c('.txt')),
           fileInput("dane_2", 'Wybierz drugi plik .txt',
@@ -38,6 +39,11 @@ app_ui <- function(request) {
                                       'Wszystkie nałożone jako linie + linia trendu' = 'linie',
                                       'Wszystkie nałożone jako punkty + linia trendu' = 'punkty',
                                       'Tylko linie trendu' = 'trend')),
+          radioButtons('jaki_trend', "Jak wyliczyć linię trendu?", 
+                       choices = list('Loess (ze stat_smooth)' = 'loess',
+                                      'Średnia' = 'mean',
+                                      'Średnia ruchoma' = 'rollmean'),
+                       selected = 'loess', inline = TRUE),
           numericInput("alpha", "Podaj wartość alpha dla linii/punktów na wykresie", 0.3, 
                        min = 0, max = 1, step = 0.1),
           numericInput("trend_size", "Podaj grubość linii trendu", 1, 

@@ -10,37 +10,46 @@ app_server <- function( input, output, session ) {
   # wczytanie danych z  jednego lub dwóch plików, dodanie im grupy i nazw kolumn
   dane <- reactive({
     
-    inFile_1 <- input$dane_1
-    inFile_2 <- input$dane_2
-    # jak plik pierwszy pusty zwraca null
-    if (is.null(inFile_1)){
-      return(NULL)
-    } else {
+    if(input$example == TRUE){
       
-      d <- read.table(inFile_1$datapath, header=as.logical(input$header), sep = input$sep, quote = "\"")
-      d$grupa <- 'x'
-      if(ncol(d) == 4){
-        d <- d[,-1]
-      }
+      d <- przyklad
       
-    }
-    
-    if (is.null(inFile_2)){
-      # gdy nie ma pliku dwa to zwraca zawartość pierwszego
-      colnames(d) <- c('dlugosc', 'int', 'grupa')
-      #d$dlugosc <- as.numeric(d$dlugosc)
       return(d)
       
     } else {
-      # jak jest plik dwa to łączy je razem, grupy x , y
-      d_2 <- read.table(inFile_2$datapath, header=as.logical(input$header), fill = TRUE, sep = input$sep, quote = "\"", stringsAsFactors = FALSE)
-      d_2$grupa <- 'y'
-      if(ncol(d_2) == 4){
-        d_2 <- d_2[,-1]
+      
+      inFile_1 <- input$dane_1
+      inFile_2 <- input$dane_2
+      # jak plik pierwszy pusty zwraca null
+      if (is.null(inFile_1)){
+        return(NULL)
+      } else {
+        
+        d <- read.table(inFile_1$datapath, header=as.logical(input$header), sep = input$sep, quote = "\"")
+        d$grupa <- 'x'
+        if(ncol(d) == 4){
+          d <- d[,-1]
+        }
+        
       }
-      d <- rbind(d, d_2)
-      colnames(d) <- c('dlugosc', 'int', 'grupa')
-      return(d)
+      
+      if (is.null(inFile_2)){
+        # gdy nie ma pliku dwa to zwraca zawartość pierwszego
+        colnames(d) <- c('dlugosc', 'int', 'grupa')
+        #d$dlugosc <- as.numeric(d$dlugosc)
+        return(d)
+        
+      } else {
+        # jak jest plik dwa to łączy je razem, grupy x , y
+        d_2 <- read.table(inFile_2$datapath, header=as.logical(input$header), fill = TRUE, sep = input$sep, quote = "\"", stringsAsFactors = FALSE)
+        d_2$grupa <- 'y'
+        if(ncol(d_2) == 4){
+          d_2 <- d_2[,-1]
+        }
+        d <- rbind(d, d_2)
+        colnames(d) <- c('dlugosc', 'int', 'grupa')
+        return(d)
+      }
     }
   })
   
@@ -55,11 +64,11 @@ app_server <- function( input, output, session ) {
     # normalizacja dlugości i intensywności - odjęcie minimum i dzielenie przez maksimum dla każdej komórki
     if(input$procent_x == TRUE){
       data <- data %>% dplyr::group_by(grupa, ind) %>% dplyr::mutate(dlugosc = dlugosc - min(dlugosc),
-                                                       dlugosc = dlugosc/max(dlugosc))
+                                                                     dlugosc = dlugosc/max(dlugosc))
     }
     if(input$procent_y == TRUE){
       data <- data %>% dplyr::group_by(grupa, ind) %>% dplyr::mutate(int = int - min(int),
-                                                       int = int/max(int))
+                                                                     int = int/max(int))
     }
     
     return(data)
@@ -95,7 +104,35 @@ app_server <- function( input, output, session ) {
     }
     # sama linia trendu
     if(input$jaki_wykres %in% c('linie', 'punkty', 'trend')){
-      p <- p + ggplot2::stat_smooth(size = input$trend_size)
+      
+      if(input$jaki_trend == 'loess'){
+        p <- p + ggplot2::stat_smooth(size = input$trend_size)
+      } else {
+        
+        data %>% dplyr::group_by(grupa, dlug_cut = cut(dlugosc, breaks = seq(0, 1, by = 0.02))) %>%
+          dplyr::summarise(mean_int = mean(int)) %>%
+          dplyr::mutate(dlug_cut = seq(0,1, by=0.02)) %>%
+          dplyr::mutate(roll_int = zoo::rollmean(x=mean_int, k = 5, fill = NA)) -> data_sum
+        
+        if(input$jaki_trend == 'mean'){
+          
+          p <- p + ggplot2::geom_line(data = data_sum, ggplot2::aes(y = mean_int,
+                                                                    x = dlug_cut),
+                                      size = input$trend_size)
+          
+        }
+        
+        if(input$jaki_trend == 'rollmean'){
+          
+          p <- p + ggplot2::geom_line(data = data_sum, ggplot2::aes(y = roll_int,
+                                                                    x = dlug_cut),
+                                      size = input$trend_size)
+          
+        }
+        
+      }
+      
+      
     }
     # białe tło
     p <- p + ggplot2::theme_bw()
@@ -109,13 +146,13 @@ app_server <- function( input, output, session ) {
     # jak nie ma podanych kolorów to używa standardowych dla ggplot
     if(input$wlasne_kolory == ''){
       p <- p + ggplot2::scale_color_discrete(name = input$legenda_nazwa,
-                                    labels = moje_grupy) 
+                                             labels = moje_grupy) 
       
       # podane nazwy kolorów zmieniane na wektor i używane w scale_color_manual
     } else {
       my_colors <- sub(' ', '', unlist(stringr::str_split(input$wlasne_kolory, ',')))
       p <- p + ggplot2::scale_color_manual(name = input$legenda_nazwa, values = my_colors,
-                                  labels = moje_grupy)
+                                           labels = moje_grupy)
     }
     
     
@@ -130,7 +167,7 @@ app_server <- function( input, output, session ) {
   
   # funckja pokazujące wykres w aplikacji
   output$wykres <- renderPlot({
-    if (is.null(input$dane_1))
+    if (is.null(input$dane_1) & input$example == FALSE)
       return(NULL)
     print(wykresInput())
   })
