@@ -1,10 +1,6 @@
 Package: smoother
 Title: Fluorescence smoother app for microscopic data
-<<<<<<< HEAD
 Version: 0.1.0.0000
-=======
-Version: 0.0.0.9000
->>>>>>> 115bbc65fb1f03b70e395fc112fbaf0091cce171
 Authors@R: person('Agnieszka', 'Strzałka', email = 'the.larch19@gmail.com', role = c('cre', 'aut'))
 Description: Application for creating a smoothed plot of fluorescence profiles for 1 or 2 fluorophores.
 License: MIT + file LICENSE
