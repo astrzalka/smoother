@@ -181,4 +181,6 @@ app_server <- function( input, output, session ) {
       dev.off()
     })
   
+  output$dane <- renderTable(head(dane()))
+  
 }

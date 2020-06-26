@@ -11,6 +11,9 @@ app_ui <- function(request) {
     # List the first level UI elements here 
     fluidPage(
       theme = shinythemes::shinytheme("united"),
+      tags$head(
+        tags$style(HTML("hr {border-top: 1px solid #000000;}"))
+      ),
       # Application title
       titlePanel("Dodaje linię trendu do wykresu fluorescencji"),
       
@@ -69,7 +72,13 @@ app_ui <- function(request) {
         ),
         
         # Show a plot 
-        mainPanel(plotOutput("wykres", height = "600px")
+        mainPanel(
+          plotOutput("wykres", height = "700px"),
+          br(),
+          hr(),
+          br(),
+          h4("Pierwsze 6 wierszy wczytanego pliku, kolumna grupa i nazwy kolumn są dodawane automatycznie"),
+          tableOutput("dane")
                   
         )
       )
