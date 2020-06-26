@@ -19,6 +19,7 @@ usethis::use_package( "ggplot2" )
 usethis::use_package( "dplyr" )
 usethis::use_package( "stringr" )
 usethis::use_package( "zoo" )
+usethis::use_package( "shinythemes" )
 
 ## Add modules ----
 ## Create a module infrastructure in R/

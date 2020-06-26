@@ -10,6 +10,7 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # List the first level UI elements here 
     fluidPage(
+      theme = shinythemes::shinytheme("united"),
       # Application title
       titlePanel("Dodaje linię trendu do wykresu fluorescencji"),
       
