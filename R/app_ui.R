@@ -92,8 +92,14 @@ app_ui <- function(request) {
                ),
                tabPanel("kmeans",
                         sidebarLayout(
-                          sidebarPanel(),
-                          mainPanel()
+                          sidebarPanel(
+                            numericInput('n_clusters', "Podaj liczbę grup", min = 2, step = 1, value = 2)
+                          ),
+                          mainPanel(
+                            plotOutput("wykres_kmeans", height = "700px"),
+                            tableOutput("dane_kmeans")
+                            
+                          )
                         )
                )
     )

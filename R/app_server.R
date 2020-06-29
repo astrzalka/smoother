@@ -183,4 +183,118 @@ app_server <- function( input, output, session ) {
   
   output$dane <- renderTable(head(dane()))
   
+  
+  dane_kmeans <- reactive({
+    
+    data <- dane_final()
+    
+    if(input$procent_x == TRUE){
+      
+      dane_kmeans <- fluorescence_kmeans(data, n_clusters = input$n_clusters)
+      
+      return(dane_kmeans)
+    } 
+    
+    
+  })
+  
+  output$dane_kmeans <- renderTable(dane_kmeans())
+  
+  plot_kmeans <- reactive({
+    
+    dane_kmeans <- dane_kmeans()
+    
+    dane <- dane_final()
+    
+    
+    dane_kmeans %>% 
+      dplyr::select(grupa, ind, cluster)  %>%
+      dplyr::distinct(grupa, ind, cluster) %>%
+      dplyr::right_join(dane) -> dane_plot
+    
+    p <- ggplot2::ggplot(dane_plot, ggplot2::aes(x = dlugosc, y = int, color = grupa))+
+      ggplot2::facet_wrap(~cluster)#+
+      #ggplot2::stat_smooth()
+    
+    # linia trendu + linie
+    if(input$jaki_wykres == 'linie'){
+      p <- p + ggplot2::geom_line(ggplot2::aes(group = ind2), alpha = input$alpha)
+    }
+
+    # linia trendu + punkty
+    if(input$jaki_wykres == 'punkty'){
+      p <- p + ggplot2::geom_point(alpha = input$alpha)
+    }
+    # sama linia trendu
+    if(input$jaki_wykres %in% c('linie', 'punkty', 'trend')){
+
+      if(input$jaki_trend == 'loess'){
+        p <- p + ggplot2::stat_smooth(size = input$trend_size)
+      } else {
+
+        dane_plot %>% dplyr::group_by(cluster, grupa, 
+                                      dlug_cut = cut(dlugosc, breaks = seq(0, 1, by = 0.02)),
+                                      .drop=FALSE) %>%
+          dplyr::summarise(mean_int = mean(int)) %>%
+          dplyr::mutate(dlug_cut = seq(0,1, by=0.02)) %>%
+          dplyr::mutate(roll_int = zoo::rollmean(x=mean_int, k = 5, fill = NA)) -> data_sum
+
+        if(input$jaki_trend == 'mean'){
+
+          p <- p + ggplot2::geom_line(data = data_sum, ggplot2::aes(y = mean_int,
+                                                                    x = dlug_cut),
+                                      size = input$trend_size)
+
+        }
+
+        if(input$jaki_trend == 'rollmean'){
+
+          p <- p + ggplot2::geom_line(data = data_sum, ggplot2::aes(y = roll_int,
+                                                                    x = dlug_cut),
+                                      size = input$trend_size)
+
+        }
+
+      }
+
+
+     }
+    # białe tło
+    p <- p + ggplot2::theme_bw()
+    # nazwy osi
+    p <- p + ggplot2::xlab(input$os_x_nazwa)+
+      ggplot2::ylab(input$os_y_nazwa)
+
+    # zamiana podanych nazw grup na wektor nazw
+    moje_grupy <- sub(' ', '', unlist(stringr::str_split(input$legenda_grupy, ',')))
+
+    # jak nie ma podanych kolorów to używa standardowych dla ggplot
+    if(input$wlasne_kolory == ''){
+      p <- p + ggplot2::scale_color_discrete(name = input$legenda_nazwa,
+                                             labels = moje_grupy)
+
+      # podane nazwy kolorów zmieniane na wektor i używane w scale_color_manual
+    } else {
+      my_colors <- sub(' ', '', unlist(stringr::str_split(input$wlasne_kolory, ',')))
+      p <- p + ggplot2::scale_color_manual(name = input$legenda_nazwa, values = my_colors,
+                                           labels = moje_grupy)
+    }
+
+
+    # czy dodać legendę?
+    if(input$czy_legenda == FALSE){
+      p <- p + ggplot2::theme(legend.position = 'none')
+    }
+
+    
+    print(p)
+    
+  })
+  
+  output$wykres_kmeans <- renderPlot({
+    if (is.null(input$dane_1) & input$example == FALSE)
+      return(NULL)
+    print(plot_kmeans())
+  })
+  
 }
