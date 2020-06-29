@@ -93,7 +93,11 @@ app_ui <- function(request) {
                tabPanel("kmeans",
                         sidebarLayout(
                           sidebarPanel(
-                            numericInput('n_clusters', "Podaj liczbę grup", min = 2, step = 1, value = 2)
+                            numericInput('n_clusters', "Podaj liczbę grup", min = 2, step = 1, value = 2),
+                            downloadButton('download_wykres_kmeans', 'Pobierz wykres (dodaj .png do nazwy pliku)'),
+                            numericInput('width_kmeans', 'Szerokość obrazka [cm]', 20, min = 5, max = 25),
+                            numericInput('height_kmeans', 'Wysokość obrazka [cm]', 14, min = 5, max = 25),
+                            numericInput('res_kmeans', 'Rozdzielczość', 200, min = 100, max = 500)
                           ),
                           mainPanel(
                             plotOutput("wykres_kmeans", height = "700px"),

@@ -297,4 +297,13 @@ app_server <- function( input, output, session ) {
     print(plot_kmeans())
   })
   
+  # funkcja do zapisania wyrkesu jako .png
+  output$download_wykres_kmeans <- downloadHandler(
+    filename = function() { paste(input$dataset, '.png', sep='') },
+    content = function(file) {
+      png(file, res = input$res_kmeans, width = input$width_kmeans, input$height_kmeans, unit = 'cm')
+      print(plot_kmeans())
+      dev.off()
+    })
+  
 }
