@@ -29,31 +29,60 @@ fluorescence_kmeans <- function(data_input, n_clusters){
   
   wyniki <- list()
   
+  # for(i in 1:length(grupy)){
+  #   
+  #   data_temp <- data %>% dplyr::filter(grupa == grupy[i]) 
+  #   
+  #   data_temp_input <- data_input %>% dplyr::filter(grupa == grupy[i]) 
+  #   
+  #   data_temp %>% 
+  #     ungroup() %>%
+  #     select(-grupa, -dlug_proc) %>%
+  #     tidyr::pivot_wider(names_from = ind, values_from = mean_int) %>%
+  #     tidyr::unnest() %>%
+  #     as.matrix() %>%
+  #     t() -> 
+  #     data_temp_wider
+  #   
+  #   model <- kmeans(data_temp_wider, centers = n_clusters)
+  #   
+  #   clusters <- model$cluster
+  #   
+  #   data_temp_input$cluster <- clusters[data_temp_input$ind]
+  #   
+  #   wyniki[[i]] <- data_temp_input
+  # }
+  wyniki_wider <- list()
   for(i in 1:length(grupy)){
     
-    data_temp <- data %>% dplyr::filter(grupa == grupy[i]) 
+    data_temp <- data %>% dplyr::filter(grupa == grupy[i])
     
-    data_temp_input <- data_input %>% dplyr::filter(grupa == grupy[i]) 
+    #data_temp_input <- data_input %>% dplyr::filter(grupa == grupy[i])
     
-    data_temp %>% 
+    data_temp %>%
       ungroup() %>%
       select(-grupa, -dlug_proc) %>%
       tidyr::pivot_wider(names_from = ind, values_from = mean_int) %>%
       tidyr::unnest() %>%
       as.matrix() %>%
-      t() -> 
+      t() ->
       data_temp_wider
     
-    model <- kmeans(data_temp_wider, centers = n_clusters)
+    wyniki_wider[[i]] <- data_temp_wider
     
-    clusters <- model$cluster
-    
-    data_temp_input$cluster <- clusters[data_temp_input$ind]
-    
-    wyniki[[i]] <- data_temp_input
   }
   
-  wyniki_tabela <- do.call(rbind, wyniki)
+  wyniki_wider <- do.call(cbind, wyniki_wider)
+  
+  model <- kmeans(wyniki_wider, centers = n_clusters)
+  
+  clusters <- model$cluster
+  
+  data_input$cluster <- clusters[data_input$ind]
+  
+  wyniki_tabela <- data_input
+  
+  #wyniki_tabela <- do.call(rbind, wyniki)
   
   return(wyniki_tabela)
   
