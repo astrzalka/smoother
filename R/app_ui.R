@@ -9,79 +9,93 @@ app_ui <- function(request) {
     # Leave this function for adding external resources
     golem_add_external_resources(),
     # List the first level UI elements here 
-    fluidPage(
-      theme = shinythemes::shinytheme("united"),
-      tags$head(
-        tags$style(HTML("hr {border-top: 1px solid #000000;}"))
-      ),
-      # Application title
-      titlePanel("Dodaje linię trendu do wykresu fluorescencji"),
-      
-      sidebarLayout(
-        sidebarPanel(
-          checkboxInput('example', 'Czy chcesz załadować przykładowe dane?'),
-          fileInput("dane_1", 'Wybierz pierwszy plik .txt',
-                    accept=c('.txt')),
-          fileInput("dane_2", 'Wybierz drugi plik .txt',
-                    accept=c('.txt')),
-          radioButtons('header', 'Czy dane mają nagłówki?', choices = list("Tak" = TRUE, "Nie" = FALSE), 
-                       inline = TRUE),
-          radioButtons('sep', 'Separator?',
-                       c(Przecinek=',',
-                         Średnik=';',
-                         Tabulator='\t', 
-                         Spacja = " "),
-                       "\t", inline = TRUE),
-          radioButtons("procent_x", "Czy zmienić dlugość komórki na procenty", 
-                       choices = list("Tak" = TRUE, "Nie" = FALSE), 
-                       selected = TRUE, inline = TRUE),
-          radioButtons("procent_y", "Czy zmienić intensywność fluorescencji na procenty", 
-                       choices = list("Tak" = TRUE, "Nie" = FALSE), 
-                       selected = TRUE, inline = TRUE),
-          radioButtons('jaki_wykres', "Jaki wykres narysować?", 
-                       choices = list('Pierwsze 10 komórek' = 'example', 
-                                      'Wszystkie nałożone jako linie + linia trendu' = 'linie',
-                                      'Wszystkie nałożone jako punkty + linia trendu' = 'punkty',
-                                      'Tylko linie trendu' = 'trend')),
-          radioButtons('jaki_trend', "Jak wyliczyć linię trendu?", 
-                       choices = list('Loess (ze stat_smooth)' = 'loess',
-                                      'Średnia' = 'mean',
-                                      'Średnia ruchoma' = 'rollmean'),
-                       selected = 'loess', inline = TRUE),
-          numericInput("alpha", "Podaj wartość alpha dla linii/punktów na wykresie", 0.3, 
-                       min = 0, max = 1, step = 0.1),
-          numericInput("trend_size", "Podaj grubość linii trendu", 1, 
-                       min = 0, max = 10, step = 0.1),
-          textInput('wlasne_kolory', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
+    navbarPage("smoother",
+               selected = "Dodaje linię trendu do wykresu fluorescencji",
+               theme = shinythemes::shinytheme("united"),
+               tags$head(
+                 tags$style(HTML("hr {border-top: 1px solid #000000;}"))
+               ),
+               tabPanel(
+                 # Panel title
+                 "Dodaje linię trendu do wykresu fluorescencji",
+                 
+                 sidebarLayout(
+                   sidebarPanel(
+                     checkboxInput('example', 'Czy chcesz załadować przykładowe dane?'),
+                     fileInput("dane_1", 'Wybierz pierwszy plik .txt',
+                               accept=c('.txt')),
+                     fileInput("dane_2", 'Wybierz drugi plik .txt',
+                               accept=c('.txt')),
+                     radioButtons('header', 'Czy dane mają nagłówki?', choices = list("Tak" = TRUE, "Nie" = FALSE), 
+                                  inline = TRUE),
+                     radioButtons('sep', 'Separator?',
+                                  c(Przecinek=',',
+                                    Średnik=';',
+                                    Tabulator='\t', 
+                                    Spacja = " "),
+                                  "\t", inline = TRUE),
+                     radioButtons("procent_x", "Czy zmienić dlugość komórki na procenty", 
+                                  choices = list("Tak" = TRUE, "Nie" = FALSE), 
+                                  selected = TRUE, inline = TRUE),
+                     radioButtons("procent_y", "Czy zmienić intensywność fluorescencji na procenty", 
+                                  choices = list("Tak" = TRUE, "Nie" = FALSE), 
+                                  selected = TRUE, inline = TRUE),
+                     radioButtons('jaki_wykres', "Jaki wykres narysować?", 
+                                  choices = list('Pierwsze 10 komórek' = 'example', 
+                                                 'Wszystkie nałożone jako linie + linia trendu' = 'linie',
+                                                 'Wszystkie nałożone jako punkty + linia trendu' = 'punkty',
+                                                 'Tylko linie trendu' = 'trend')),
+                     radioButtons('jaki_trend', "Jak wyliczyć linię trendu?", 
+                                  choices = list('Loess (ze stat_smooth)' = 'loess',
+                                                 'Średnia' = 'mean',
+                                                 'Średnia ruchoma' = 'rollmean'),
+                                  selected = 'loess', inline = TRUE),
+                     numericInput("alpha", "Podaj wartość alpha dla linii/punktów na wykresie", 0.3, 
+                                  min = 0, max = 1, step = 0.1),
+                     numericInput("trend_size", "Podaj grubość linii trendu", 1, 
+                                  min = 0, max = 10, step = 0.1),
+                     textInput('wlasne_kolory', 'Tutaj wpisz wybrane nazwy kolorów oddzielając je przecinkiem. Powinny być to kolory 
                                           predefiniowane w R (można sprawdzić jakie np. na stronie 
                                           http://sape.inf.usi.ch/quick-reference/ggplot2/colour) albo skorzystać 
                                           z notacji #FF0000',  ''),
-          radioButtons("czy_legenda", "Czy dodać legendę do wykresu", 
-                       choices = list("Tak" = "TRUE", "Nie" = "FALSE"), 
-                       selected = "TRUE", inline = TRUE),
-          textInput('legenda_nazwa', 'Tytuł legendy', 'Białko'),
-          textInput('legenda_grupy', 'Podaj nazwy grup do legendy oddzielone przecinkiem', 'x, y'),
-          textInput('os_x_nazwa', 'Nazwa osi X', '% długości komórki'),
-          textInput('os_y_nazwa', 'Nazwa osi Y', '% intensywności fluorescencji'),
-          downloadButton('download_wykres', 'Pobierz wykres (dodaj .png do nazwy pliku)'),
-          numericInput('width', 'Szerokość obrazka [cm]', 20, min = 5, max = 25),
-          numericInput('height', 'Wysokość obrazka [cm]', 14, min = 5, max = 25),
-          numericInput('res', 'Rozdzielczość', 200, min = 100, max = 500)
-          
-          
-        ),
-        
-        # Show a plot 
-        mainPanel(
-          plotOutput("wykres", height = "700px"),
-          br(),
-          hr(),
-          br(),
-          h4("Pierwsze 6 wierszy wczytanego pliku, kolumna grupa i nazwy kolumn są dodawane automatycznie"),
-          tableOutput("dane")
-                  
-        )
-      )
+                     radioButtons("czy_legenda", "Czy dodać legendę do wykresu", 
+                                  choices = list("Tak" = "TRUE", "Nie" = "FALSE"), 
+                                  selected = "TRUE", inline = TRUE),
+                     textInput('legenda_nazwa', 'Tytuł legendy', 'Białko'),
+                     textInput('legenda_grupy', 'Podaj nazwy grup do legendy oddzielone przecinkiem', 'x, y'),
+                     textInput('os_x_nazwa', 'Nazwa osi X', '% długości komórki'),
+                     textInput('os_y_nazwa', 'Nazwa osi Y', '% intensywności fluorescencji'),
+                     downloadButton('download_wykres', 'Pobierz wykres (dodaj .png do nazwy pliku)'),
+                     numericInput('width', 'Szerokość obrazka [cm]', 20, min = 5, max = 25),
+                     numericInput('height', 'Wysokość obrazka [cm]', 14, min = 5, max = 25),
+                     numericInput('res', 'Rozdzielczość', 200, min = 100, max = 500)
+                     
+                     
+                   ),
+                   
+                   # Show a plot 
+                   mainPanel(
+                     tabsetPanel(type = "tabs",
+                                 tabPanel("Wykres",
+                                   plotOutput("wykres", height = "700px")
+                                 ),
+                                 #br(),
+                                 #hr(),
+                                 #br(),
+                                 tabPanel("Dane",
+                                   h4("Pierwsze 6 wierszy wczytanego pliku, kolumna grupa i nazwy kolumn są dodawane automatycznie"),
+                                   tableOutput("dane")
+                                 )
+                     )
+                   )
+                 )
+               ),
+               tabPanel("kmeans",
+                        sidebarLayout(
+                          sidebarPanel(),
+                          mainPanel()
+                        )
+               )
     )
   )
 }
