@@ -15,3 +15,45 @@ dodaj_ind <- function(wektor){
   }
   return(nowy_wektor)
 }
+
+# inputem będą dane_final z shiny, które mają 5 kolumn: dlugosc, int, grupa, ind, ind2
+fluorescence_kmeans <- function(data, n_clusters){
+  
+  data %>% dplyr::group_by(grupa, ind, dlug_cut = cut(dlugosc, breaks = seq(0, 1.01, by = 0.05))) %>%
+    dplyr::summarise(mean_int = mean(int)) %>%
+    dplyr::filter(!is.na(dlug_cut)) %>%
+    dplyr::mutate(dlug_proc = seq(0,0.99, by=0.05)) %>%
+    dplyr::select(-dlug_cut) -> data
+  
+  grupy <- unique(data$grupa)
+  
+  wyniki <- list()
+  
+  for(i in 1:length(grupy)){
+    
+    data_temp <- data %>% dplyr::filter(grupa == grupy[i]) 
+      
+    
+    data_temp %>% 
+      ungroup() %>%
+      select(-grupa) %>%
+      tidyr::pivot_wider(names_from = ind, values_from = mean_int) %>%
+      tidyr::unnest() %>%
+      as.matrix() %>%
+      t() -> 
+      data_temp_wider
+    
+    model <- kmeans(data_temp_wider, centers = n_clusters)
+    
+    clusters <- model$cluster
+    
+    data_temp$cluster <- clusters[data_temp$ind]
+    
+    wyniki[[i]] <- data_temp
+  }
+  
+  wyniki_tabela <- do.call(rbind, wyniki)
+  
+  return(wyniki_tabela)
+  
+}
