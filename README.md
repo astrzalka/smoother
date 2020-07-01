@@ -18,6 +18,8 @@ You can install the released version of smoother from Github:
 
 ``` r
 devtools::install_github('astrzalka/smoother')
+
+smoother::run_app()
 ```
 
 smoother includes example datasets stored in data-raw directory. Example
