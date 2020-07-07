@@ -20,6 +20,9 @@ usethis::use_package( "dplyr" )
 usethis::use_package( "stringr" )
 usethis::use_package( "zoo" )
 usethis::use_package( "shinythemes" )
+usethis::use_package( "ppclust" )
+usethis::use_package( "factoextra" )
+
 
 ## Add modules ----
 ## Create a module infrastructure in R/

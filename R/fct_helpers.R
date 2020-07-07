@@ -17,7 +17,7 @@ dodaj_ind <- function(wektor){
 }
 
 # inputem będą dane_final z shiny, które mają 5 kolumn: dlugosc, int, grupa, ind, ind2
-fluorescence_kmeans <- function(data_input, n_clusters){
+fluorescence_kmeans <- function(data_input, n_clusters, method = 'kmeans'){
   
   data_input %>% dplyr::group_by(grupa, ind, dlug_cut = cut(dlugosc, breaks = seq(0, 1.01, by = 0.05))) %>%
     dplyr::summarise(mean_int = mean(int)) %>%
@@ -74,9 +74,19 @@ fluorescence_kmeans <- function(data_input, n_clusters){
   
   wyniki_wider <- do.call(cbind, wyniki_wider)
   
-  model <- kmeans(wyniki_wider, centers = n_clusters)
+  if(method == 'kmeans'){
+    
+    model <- kmeans(wyniki_wider, centers = n_clusters)
+    clusters <- model$cluster
+  }
   
-  clusters <- model$cluster
+  if(method == 'fuzzy'){
+    
+    model <- ppclust::fcm(wyniki_wider, centers = n_clusters)
+    clusters <- model$cluster
+  }
+  
+  
   
   data_input$cluster <- clusters[data_input$ind]
   
@@ -84,6 +94,6 @@ fluorescence_kmeans <- function(data_input, n_clusters){
   
   #wyniki_tabela <- do.call(rbind, wyniki)
   
-  return(wyniki_tabela)
+  return(list(wyniki_tabela, model, wyniki_wider))
   
 }

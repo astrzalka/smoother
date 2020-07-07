@@ -77,14 +77,14 @@ app_ui <- function(request) {
                    mainPanel(
                      tabsetPanel(type = "tabs",
                                  tabPanel("Wykres",
-                                   plotOutput("wykres", height = "700px")
+                                          plotOutput("wykres", height = "700px")
                                  ),
                                  #br(),
                                  #hr(),
                                  #br(),
                                  tabPanel("Dane",
-                                   h4("Pierwsze 6 wierszy wczytanego pliku, kolumna grupa i nazwy kolumn są dodawane automatycznie"),
-                                   tableOutput("dane")
+                                          h4("Pierwsze 6 wierszy wczytanego pliku, kolumna grupa i nazwy kolumn są dodawane automatycznie"),
+                                          tableOutput("dane")
                                  )
                      )
                    )
@@ -93,6 +93,9 @@ app_ui <- function(request) {
                tabPanel("kmeans",
                         sidebarLayout(
                           sidebarPanel(
+                            radioButtons('kmeans', 'Jaki algorytm zastosować?', 
+                                         choices = list('kmeans' = 'kmeans', 'fuzzy kmeans' = 'fuzzy'), 
+                                         inline = TRUE),
                             numericInput('n_clusters', "Podaj liczbę grup", min = 2, step = 1, value = 2),
                             downloadButton('download_wykres_kmeans', 'Pobierz wykres (dodaj .png do nazwy pliku)'),
                             numericInput('width_kmeans', 'Szerokość obrazka [cm]', 20, min = 5, max = 25),
@@ -100,9 +103,20 @@ app_ui <- function(request) {
                             numericInput('res_kmeans', 'Rozdzielczość', 200, min = 100, max = 500)
                           ),
                           mainPanel(
-                            plotOutput("wykres_kmeans", height = "700px"),
-                            tableOutput("dane_kmeans")
-                            
+                            tabsetPanel(
+                              tabPanel('Wykres - linia trendu',
+                                       plotOutput("wykres_kmeans", height = "700px")
+                              ),
+                              tabPanel('Wykres - grupy',
+                                       plotOutput("wykres_cluster", height = "600px")
+                              ),
+                              tabPanel('Podsumowanie',
+                                       verbatimTextOutput('podsumowanie_cluster')
+                                       ),
+                              tabPanel('Dane',
+                                       tableOutput("dane_kmeans")
+                              )
+                            )
                           )
                         )
                )
