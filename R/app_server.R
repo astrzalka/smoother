@@ -325,6 +325,15 @@ app_server <- function( input, output, session ) {
     }
   })
   
+  plot_grupy <- reactive({
+    
+    model <- dane_kmeans()[[2]]
+    
+    p <- plot_clusters(model, method = input$kmeans)
+    
+    return(p)
+    
+  })
   
   output$wykres_kmeans <- renderPlot({
     if (is.null(input$dane_1) & input$example == FALSE)
@@ -336,6 +345,12 @@ app_server <- function( input, output, session ) {
     if (is.null(input$dane_1) & input$example == FALSE)
       return(NULL)
     print(plot_cluster())
+  })
+  
+  output$wykres_grupy <- renderPlot({
+    if (is.null(input$dane_1) & input$example == FALSE)
+      return(NULL)
+    print(plot_grupy())
   })
   
   # funkcja do zapisania wyrkesu jako .png

@@ -97,3 +97,30 @@ fluorescence_kmeans <- function(data_input, n_clusters, method = 'kmeans'){
   return(list(wyniki_tabela, model, wyniki_wider))
   
 }
+
+
+plot_clusters <- function(model, method){
+  
+  if(method == 'fuzzy'){
+    dane_wykres<- model$u %>% as.data.frame() %>%
+      dplyr::mutate(id = 1:dplyr::n()) %>%
+      tidyr::pivot_longer(contains('Cluster'))
+  }
+  
+  if(method == 'kmeans'){
+    dane_wykres <- data.frame(name = model$cluster) %>% 
+      dplyr::mutate(id = 1:dplyr::n(), value = 1,
+                    name = paste0('Cluster ', name))
+  }
+  
+  p <- ggplot2::ggplot(dane_wykres, ggplot2::aes(x = id, y = name, size = value, color = value))
+  p <- p + ggplot2::geom_point()+
+    ggplot2::scale_color_viridis_c(direction = -1, option = 'A', guide = 'none')+
+    ggplot2::scale_size(guide = 'none')+
+    ggplot2::theme_bw()+
+    ggplot2::xlab('Komórka')+
+    ggplot2::ylab('')
+  
+  return(p)
+  
+}

@@ -108,7 +108,8 @@ app_ui <- function(request) {
                                        plotOutput("wykres_kmeans", height = "700px")
                               ),
                               tabPanel('Wykres - grupy',
-                                       plotOutput("wykres_cluster", height = "600px")
+                                       plotOutput("wykres_cluster", height = "500px"),
+                                       plotOutput("wykres_grupy", height = '300px')
                               ),
                               tabPanel('Podsumowanie',
                                        verbatimTextOutput('podsumowanie_cluster')
