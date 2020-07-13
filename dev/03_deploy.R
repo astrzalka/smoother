@@ -35,3 +35,5 @@ golem::add_dockerfile_shinyproxy()
 
 ## If you want to deploy to Heroku
 golem::add_dockerfile_heroku()
+
+golem::set_golem_version('0.2.0')
