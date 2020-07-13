@@ -1,3 +1,7 @@
+# smoother 0.2.0
+
+* Added kmeans and fuzzy kmeans clustering
+
 # smoother 0.1.0.0000
 
 * Added optional trend line generation - mean and rollmean
