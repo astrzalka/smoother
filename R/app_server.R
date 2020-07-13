@@ -217,7 +217,7 @@ app_server <- function( input, output, session ) {
     #ggplot2::stat_smooth()
     
     # linia trendu + linie
-    if(input$jaki_wykres == 'linie'){
+    if(input$jaki_wykres %in% c('linie', 'example')){
       p <- p + ggplot2::geom_line(ggplot2::aes(group = ind2), alpha = input$alpha)
     }
     
@@ -226,7 +226,7 @@ app_server <- function( input, output, session ) {
       p <- p + ggplot2::geom_point(alpha = input$alpha)
     }
     # sama linia trendu
-    if(input$jaki_wykres %in% c('linie', 'punkty', 'trend')){
+    if(input$jaki_wykres %in% c('linie', 'punkty', 'trend', 'example')){
       
       if(input$jaki_trend == 'loess'){
         p <- p + ggplot2::stat_smooth(size = input$trend_size)
