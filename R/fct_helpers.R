@@ -17,12 +17,13 @@ dodaj_ind <- function(wektor){
 }
 
 # inputem będą dane_final z shiny, które mają 5 kolumn: dlugosc, int, grupa, ind, ind2
-fluorescence_kmeans <- function(data_input, n_clusters, method = 'kmeans'){
+fluorescence_kmeans <- function(data_input, n_clusters, method = 'kmeans', binwidth = 0.05){
   
-  data_input %>% dplyr::group_by(grupa, ind, dlug_cut = cut(dlugosc, breaks = seq(0, 1.01, by = 0.05))) %>%
+data_input %>% dplyr::group_by(grupa, ind, 
+                               dlug_cut = cut(dlugosc, breaks = seq(0, 1.01, by = binwidth))) %>%
     dplyr::summarise(mean_int = mean(int)) %>%
     dplyr::filter(!is.na(dlug_cut)) %>%
-    dplyr::mutate(dlug_proc = seq(0,0.99, by=0.05)) %>%
+    dplyr::mutate(dlug_proc = seq(0, 0.99, by=binwidth)) %>%
     dplyr::select(-dlug_cut) -> data
   
   grupy <- unique(data$grupa)

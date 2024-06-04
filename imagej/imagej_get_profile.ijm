@@ -37,7 +37,7 @@ saveAs("Measurements", folder+"Values"+nazwa+"_C"+k+".txt");
 // zapisujemy zestaw ROI
 roiManager("Save", folder+"RoiSet"+nazwa+".zip");
 
-// lista wszystkich otawrtych obrazów
+// lista wszystkich otwartych obrazów
 images = getList("image.titles");
 
 // zapisuje każde analizowane ROI jako osobny tiff do folderu wybranego przez użytkownika 

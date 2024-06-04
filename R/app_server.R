@@ -4,6 +4,11 @@
 #'     DO NOT REMOVE.
 #' @import shiny
 #' @noRd
+#' 
+
+# change maximum data upload size
+options(shiny.maxRequestSize=300*1024^2) 
+
 app_server <- function( input, output, session ) {
   library(dplyr)
   # List the first level callModules here
@@ -25,7 +30,9 @@ app_server <- function( input, output, session ) {
         return(NULL)
       } else {
         
-        d <- read.table(inFile_1$datapath, header=as.logical(input$header), sep = input$sep, quote = "\"")
+        #d <- read.table(inFile_1$datapath, header=as.logical(input$header), sep = input$sep, quote = "\"")
+        d <- data.table::rbindlist(lapply(input$dane_1$datapath, read.table),
+                                   use.names = TRUE, fill = TRUE)
         d$grupa <- 'x'
         if(ncol(d) == 4){
           d <- d[,-1]
@@ -190,7 +197,8 @@ app_server <- function( input, output, session ) {
     
     if(input$procent_x == TRUE){
       
-      dane_kmeans <- fluorescence_kmeans(data, n_clusters = input$n_clusters, method = input$kmeans)
+      dane_kmeans <- fluorescence_kmeans(data, n_clusters = input$n_clusters, method = input$kmeans,
+                                         binwidth = input$breaks_cluster)
       
       return(dane_kmeans)
     } 
@@ -198,7 +206,7 @@ app_server <- function( input, output, session ) {
     
   })
   
-  output$dane_kmeans <- renderTable(dane_kmeans()[[1]])
+  output$dane_kmeans <- renderTable(head(dane_kmeans()[[1]]))
   
   plot_kmeans <- reactive({
     
@@ -361,5 +369,18 @@ app_server <- function( input, output, session ) {
       print(plot_kmeans())
       dev.off()
     })
+  
+  
+  output$download_cluster <- downloadHandler(
+    
+    filename = function() {
+      paste('wynik_cluster.txt', sep = '')
+    },
+    content = function(file) {
+      write.table(dane_kmeans()[[1]], file)
+    }
+    
+  )
+  
   
 }
